@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 3) do
+ActiveRecord::Schema.define(version: 5) do
 
   create_table "bands", force: :cascade do |t|
     t.string "name"
@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 3) do
 
   create_table "students", force: :cascade do |t|
     t.string "name"
+    t.string "band_name"
+    t.string "instrument_name"
   end
 
 end

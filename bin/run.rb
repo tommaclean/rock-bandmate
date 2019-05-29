@@ -15,8 +15,8 @@ the_white_stripes = Band.create(name: "the white stripes")
 deftones = Band.create(name: "deftones")
 the_beatles = Band.create(name: "the beatles")
 
-Student.create(name: "Tom", band_id: the_beatles.id, instrument_id: keyboard.id)
-Student.create(name: "Josh", band_id: the_white_stripes.id, instrument_id: bass.id)
+Student.create(name: "Tom", band_id: deftones.id, instrument_id: keyboard.id)
+Student.create(name: "Josh", band_id: deftones.id, instrument_id: bass.id)
 Student.create(name: "Avi", band_id: deftones.id, instrument_id: drums.id)
 
 # set up $prompt and new student
@@ -59,7 +59,7 @@ if Student.all.map{|s|s.name}.include?(student_name)
       instrument_selection("What instrument would you like to switch to?", student)
       puts "Congratulations!  Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
     when "Delete Profile"
-      puts "del pro"
+      Student.all.delete(student)
     end
   # ^^^^ HERE!!!! ^^^^
 else
@@ -96,6 +96,13 @@ else
   end
 end
 
+if Student.all.include?(student)
+  puts "#{student.name}, you play #{Instrument.all.find{|i|i.id == student.instrument_id}.name} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
+  puts "Here's the roster':"
+  Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts s.name}
+else
+  puts "You've been expelled from the School of Rock!"
+end
 # if student exists, welcome them back & ask if they would like to view band or instrument data or delete acct
 ### if student chooses band data, they can view other band members, leave the band, or switch to another band
 ### if student chooses instrument data, they can view who else plays that instrument or change instruments

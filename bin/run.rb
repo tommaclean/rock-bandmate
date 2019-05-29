@@ -1,5 +1,16 @@
 require_relative '../config/environment'
 
+Instrument.delete_all
+Band.delete_all
+Student.delete_all
+
+# Instrument defaults
+guitar = Instrument.create(name: "Guitar")
+bass = Instrument.create(name: "Bass")
+keyboard = Instrument.create(name: "Keyboard")
+vocals = Instrument.create(name: "Vocals")
+drums = Instrument.create(name: "Drums")
+
 # set up prompt and new student
 prompt = TTY::Prompt.new
 new_student = Student.create()
@@ -27,9 +38,24 @@ else
   inst_choices = Instrument.all.map{|inst| inst.name} << "Other"
   inst_choice = prompt.select("What instrument do you play?", inst_choices)
   if inst_choice == "Other"
-    Instrument.create(name: prompt.ask("Please enter the name of your instrument:"))
+    new_student.update(instrument_id: Instrument.create(name: prompt.ask("Please enter the name of your instrument:")).id)
   else
     new_student.update(instrument_id: Instrument.all.find{|inst| inst.name == inst_choice}.id)
+  end
+  # there are no active bands so create your own!  What would you like the name of your band to be?
+  if !Band.all.empty?
+    join_or_create = prompt.select("Would you like to join a band or create your own?", %w(Join Create))
+    if join_or_create == "Join"
+      existing_bands = Band.all.map{|e|e.name}
+      join_band_selection = prompt.select("Choose a band to join:", existing_bands)
+      new_student.band_id = join_band_selection.id
+    else
+      puts "What would you like the name of your new band to be?"
+      new_student.band_id = Band.create(name: prompt.ask).id
+    end
+  else
+    create_a_band = Band.create(name: prompt.ask("There are no active bands so create your own!  What would you like the name of your band to be?"))
+    new_student.update(band_id: create_a_band.id)
   end
 end
 

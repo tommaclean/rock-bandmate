@@ -40,7 +40,13 @@ if Student.all.map{|s|s.name}.include?(student_name)
       student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
     when "Drop Band"
       current_band = Band.all.find {|band| band.id == student.band_id}
-      prompt.yes?("Are you sure you want to leave #{current_band.name}?")
+      leave_band = prompt.yes?("Are you sure you want to leave #{current_band.name}?")
+      if leave_band
+        student.band_id = nil
+        current_band.students.delete(student)
+      else
+        puts "KEEP ON ROCKIN!!!!"
+      end
     when "Change Instrument"
       puts "chg inst"
     when "Delete Profile"

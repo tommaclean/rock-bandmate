@@ -1,3 +1,7 @@
+Instrument.destroy_all
+Band.destroy_all
+Student.destroy_all
+
 # # Instruments
 guitar = Instrument.create(name: "guitar")
 drums = Instrument.create(name: "drums")
@@ -9,8 +13,8 @@ deftones = Band.create(name: "deftones")
 the_beatles = Band.create(name: "the beatles")
 
 # Students
-Student.create(name: "joe", band_name: the_white_stripes, instrument_name: bass)
-Student.create(name: "jeff", band_name: the_beatles, instrument_name: drums)
-Student.create(name: "sara", band_name: deftones, instrument_name: guitar)
+Student.create(name: "joe", band_id: the_white_stripes.id, instrument_id: bass.id)
+Student.create(name: "jeff", band_id: the_beatles.id, instrument_id: drums.id)
+Student.create(name: "sara", band_id: deftones.id, instrument_id: guitar.id)
 
 # binding.pry

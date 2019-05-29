@@ -9,8 +9,8 @@ deftones = Band.create(name: "deftones")
 the_beatles = Band.create(name: "the beatles")
 
 # Students
-Student.create(name: "joe", band_name: the_white_stripes.name, instrument_name: bass.name)
-Student.create(name: "jeff", band_name: the_beatles.name, instrument_name: drums.name)
-Student.create(name: "sara", band_name: deftones.name, instrument_name: guitar.name)
+Student.create(name: "joe", band_name: the_white_stripes, instrument_name: bass)
+Student.create(name: "jeff", band_name: the_beatles, instrument_name: drums)
+Student.create(name: "sara", band_name: deftones, instrument_name: guitar)
 
 # binding.pry

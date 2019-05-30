@@ -41,11 +41,13 @@ def get_student_name
 end
 
 def returning_student_selection(student)
-  data_choices = ["Join Band", "Drop Band", "Change Instrument", "View Band Roster / Instrument Data", "Delete Profile", "Quit"]
+  data_choices = ["Join Band", "Create Band", "Drop Band", "Change Instrument", "View Band Roster / Instrument Data", "View Profile", "Delete Profile", "Quit"]
   data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
   case data_choice
     when "Join Band"
       join_band(student)
+    when "Create Band"
+      create_band(student)
     when "Drop Band"
       if student.band_id == nil
         puts "\n"
@@ -66,6 +68,14 @@ def returning_student_selection(student)
       puts "Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
     when "View Band Roster / Instrument Data"
       view_data
+    when "View Profile"
+      puts "\nName: #{student.name}"
+      if student.band
+        puts "Current band: #{student.band.name}"
+      else
+        puts "Current band: You're not in a band!"
+      end
+      puts "Instrument: #{student.instrument.name}\n\n"
     when "Delete Profile"
       Student.all.delete(student)
       puts "\n"
@@ -162,6 +172,7 @@ def view_data
         puts "\n"
         puts "Here's the roster:"
         Band.all.find { |b| b.name == band_choice }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.capitalize}" }
+        puts "\n"
     when 'Instrument Data'
       # choose instrument: guitar
       instrument_data_choice = $prompt.select("Choose an instrument:", Instrument.all.map{|inst| inst.name})

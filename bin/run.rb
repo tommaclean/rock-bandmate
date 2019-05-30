@@ -31,8 +31,6 @@ def get_student_name
   $student_name = $prompt.ask
 end
 
-get_student_name
-
 def returning_student_selection(student)
   data_choices = ["Join Band", "Drop Band", "Change Instrument", "Delete Profile"]
   data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
@@ -94,35 +92,40 @@ def student_instrument(student)
   Instrument.all.find{|i|i.id == student.instrument_id}
 end
 
-# check if new or returning student
-# create method--initial_user_nav
-if Student.all.map{|s|s.name}.include?($student_name)
-   # if returning student set `student` to that student
-   student = Student.all.find{|s|s.name == $student_name}
-   returning_student_selection(student)
- else
-   # create new student and set to `student`
-   student = Student.create(name: $student_name)
-   new_student_selection(student)
- end
+# check if new or returning student & provide selections
+def initial_user_nav
+  if Student.all.map{|s|s.name}.include?($student_name)
+    # if returning student set `student` to that student
+    $student = Student.all.find{|s|s.name == $student_name}
+    returning_student_selection($student)
+  else
+    # create new student and set to `$student`
+    $student = Student.create(name: $student_name)
+    new_student_selection($student)
+  end
+end
+
+get_student_name
+initial_user_nav
 
 # closing message
-if Student.all.include?(student)
-  if student.band_id == nil
+if Student.all.include?($student)
+  if $student.band_id == nil
     leave_or_start_over = $prompt.select("You aren't in a band.  Would you like to join or create one?", %w(Join Create Quit))
     case leave_or_start_over
       when "Join"
-        join_band(student)
+        join_band($student)
       when "Create"
-        create_band(student)
+        create_band($student)
       when "Quit"
         puts "leaving program..........."
       end
     else
-      puts "#{student.name}, you're on #{student_instrument(student).name.downcase} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
+      puts "#{$student.name}, you're on #{student_instrument($student).name.downcase} in the band, #{Band.all.find{|b|b.id == $student.band_id}.name}!"
       puts "Here's the roster:"
-      Band.all.find { |b| b.id == student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
+      Band.all.find { |b| b.id == $student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
     end
 else
   puts "You've been expelled from the School of Rock!"
+  exit
 end

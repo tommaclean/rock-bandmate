@@ -1,5 +1,6 @@
 require_relative '../config/environment'
 
+
 Instrument.delete_all
 Band.delete_all
 Student.delete_all
@@ -37,15 +38,21 @@ def instrument_selection(msg, student)
   end
 end
 
+
+def join_band(student)
+  band_choice = $prompt.select("Choose a band to join:", Band.all.map{|band| band.name})
+  student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
+end
+
+# check if new or returning student
 if Student.all.map{|s|s.name}.include?(student_name)
+  # if returning student set `student` to that student
   student = Student.all.find{|s|s.name == student_name}
   data_choices = ["Join Band", "Drop Band", "Change Instrument", "Delete Profile"]
   data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
-# DON'T FORGET TO ADD CODE HERE!!!!!!!!!
   case data_choice
     when "Join Band"
-      band_choice = $prompt.select("Here is a list of all current bands:", Band.all.map {|band| band.name})
-      student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
+      join_band(student)
     when "Drop Band"
       current_band = Band.all.find {|band| band.id == student.band_id}
       leave_band = $prompt.yes?("Are you sure you want to leave #{current_band.name}?")
@@ -61,39 +68,22 @@ if Student.all.map{|s|s.name}.include?(student_name)
     when "Delete Profile"
       Student.all.delete(student)
     end
-  # ^^^^ HERE!!!! ^^^^
-else
-  student = Student.create(name: student_name)
-  # student.update(name: student_name)
-
-  instrument_selection("What instrument do you play?", student)
-
-  ##################################################################
-  ##################################################################
-  # inst_choices = Instrument.all.map{|inst| inst.name} << "Other"
-  # inst_choice = $prompt.select("What instrument do you play?", inst_choices)
-  # if inst_choice == "Other"
-  #   student.update(instrument_id: Instrument.create(name: $prompt.ask("Please enter the name of your instrument:")).id)
-  # else
-  #   student.update(instrument_id: Instrument.all.find{|inst| inst.name == inst_choice}.id)
-  # end
-  ##################################################################
-  ##################################################################
-  # there are no active bands so create your own!  What would you like the name of your band to be?
-  if !Band.all.empty?
-    join_or_create = $prompt.select("Would you like to join a band or create your own?", %w(Join Create))
-    if join_or_create == "Join"
-      existing_bands = Band.all.map{|e|e.name}
-      join_band_selection = $prompt.select("Choose a band to join:", existing_bands)
-      student.update(band_id: Band.all.find{|band| band.name == join_band_selection}.id)
-    else
-      student.update(band_id: Band.create(name: $prompt.ask("What would you like the name of your new band to be?")).id)
-    end
-  else
-    create_a_band = Band.create(name: $prompt.ask("There are no active bands so create your own!  What would you like the name of your band to be?"))
-    student.update(band_id: create_a_band.id)
-  end
-end
+ else
+   # create new student and set to `student`
+   student = Student.create(name: student_name)
+   instrument_selection("What instrument do you play?", student)
+   if !Band.all.empty?
+     join_or_create = $prompt.select("Would you like to join a band or create your own?", %w(Join Create))
+     if join_or_create == "Join"
+       join_band(student)
+     else
+       student.update(band_id: Band.create(name: $prompt.ask("What would you like the name of your new band to be?")).id)
+     end
+   else
+     create_a_band = Band.create(name: $prompt.ask("There are no active bands so create your own!  What would you like the name of your band to be?"))
+     student.update(band_id: create_a_band.id)
+   end
+ end
 
 # closing message
 if Student.all.include?(student)

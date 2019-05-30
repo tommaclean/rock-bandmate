@@ -2,7 +2,6 @@
 source "https://rubygems.org"
 
 # gem "activerecord"
-gem "curses"
 gem "tty-prompt"
 gem "sinatra-activerecord"
 gem "sqlite3"

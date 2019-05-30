@@ -95,10 +95,23 @@ else
   end
 end
 
+# closing message
 if Student.all.include?(student)
-  puts "#{student.name}, you play #{Instrument.all.find{|i|i.id == student.instrument_id}.name} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
-  puts "Here's the roster:"
-  Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts "#{s.name}: #{Instrument.all.find{|i|i.id == s.instrument_id}.name}"}
+  if student.band_id == nil
+    leave_or_start_over = $prompt.select("You aren't in a band.  Would you like to join or create one?", %w(Join Create Quit))
+    case leave_or_start_over
+      when "Join"
+        puts "join a band------"
+      when "Create"
+        puts "create a band-----"
+      when "Quit"
+        puts "leaving program..........."
+      end
+    else
+      puts "#{student.name}, you play #{Instrument.all.find{|i|i.id == student.instrument_id}.name} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
+      puts "Here's the roster:"
+      Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts "#{s.name}: #{Instrument.all.find{|i|i.id == s.instrument_id}.name}"}
+    end
 else
   puts "You've been expelled from the School of Rock!"
 end

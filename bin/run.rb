@@ -1,3 +1,4 @@
+
 require_relative '../config/environment'
 # require_relative ''
 
@@ -33,7 +34,6 @@ Student.create(name: "Tony", band_id: the_beatles.id, instrument_id: drums.id)
 # set up $prompt and new student
 $prompt = TTY::Prompt.new
 # student = Student.create()
-
 # get student name
 def get_student_name
   puts "What is your name?"
@@ -76,12 +76,12 @@ def returning_student_selection(student)
         get_student_name
         initial_user_nav
       else
-        puts "Thanks for using Rock Bandmaker!"
+        puts "Thanks for using Rock BandMaker!"
         exit
       end
     when "Quit"
       puts "\n"
-      puts "Thanks for using Rock Bandmaker!"
+      puts "Thanks for using Rock BandMaker!"
       exit
   end
   leave_or_start_over("So what's next?")
@@ -149,7 +149,7 @@ def leave_or_start_over(msg)
     when "Main Menu"
       returning_student_selection($student)
     when "Quit"
-      puts "Thanks for using Rock Bandmaker!"
+      puts "Thanks for using Rock BandMaker!"
       exit
   end
 end
@@ -221,7 +221,7 @@ def closing_message
         puts "Here's the roster:"
         Band.all.find { |b| b.id == $student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
         puts "\n"
-        leave_or_start_over(msg)
+        leave_or_start_over("What would you like to do next?")
       end
   else
     puts "You've been expelled from the School of Rock!"

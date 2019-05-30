@@ -1,5 +1,5 @@
 require_relative '../config/environment'
-
+# require_relative ''
 
 Instrument.delete_all
 Band.delete_all
@@ -19,6 +19,7 @@ the_beatles = Band.create(name: "the beatles")
 Student.create(name: "Tom", band_id: deftones.id, instrument_id: keyboard.id)
 Student.create(name: "Josh", band_id: deftones.id, instrument_id: bass.id)
 Student.create(name: "Avi", band_id: deftones.id, instrument_id: drums.id)
+
 
 # set up $prompt and new student
 $prompt = TTY::Prompt.new

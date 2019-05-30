@@ -19,6 +19,15 @@ the_beatles = Band.create(name: "the beatles")
 Student.create(name: "Tom", band_id: deftones.id, instrument_id: keyboard.id)
 Student.create(name: "Josh", band_id: deftones.id, instrument_id: bass.id)
 Student.create(name: "Avi", band_id: deftones.id, instrument_id: drums.id)
+Student.create(name: "Joe", band_id: the_beatles.id, instrument_id: guitar.id)
+Student.create(name: "George", band_id: the_beatles.id, instrument_id: bass.id)
+Student.create(name: "Carla", band_id: the_beatles.id, instrument_id: drums.id)
+Student.create(name: "Lucy", band_id: the_white_stripes.id, instrument_id: keyboard.id)
+Student.create(name: "Kenton", band_id: the_white_stripes.id, instrument_id: bass.id)
+Student.create(name: "Bill", band_id: the_white_stripes.id, instrument_id: drums.id)
+Student.create(name: "Kevin", band_id: the_white_stripes.id, instrument_id: guitar.id)
+Student.create(name: "Greg", band_id: the_beatles.id, instrument_id: bass.id)
+Student.create(name: "Tony", band_id: the_beatles.id, instrument_id: drums.id)
 
 
 # set up $prompt and new student
@@ -32,12 +41,18 @@ def get_student_name
 end
 
 def returning_student_selection(student)
-  data_choices = ["Join Band", "Drop Band", "Change Instrument", "View Data", "Delete Profile"]
+  data_choices = ["Join Band", "Drop Band", "Change Instrument", "View Band Roster / Instrument Data", "Delete Profile", "Quit"]
   data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
   case data_choice
     when "Join Band"
       join_band(student)
     when "Drop Band"
+      if student.band_id == nil
+        puts "\n"
+        puts "You're not in a band! Back to the main menu with you!"
+        puts "\n"
+        returning_student_selection(student)
+      end
       current_band = Band.all.find {|band| band.id == student.band_id}
       leave_band = $prompt.yes?("Are you sure you want to leave #{current_band.name}?")
       if leave_band
@@ -49,11 +64,27 @@ def returning_student_selection(student)
     when "Change Instrument"
       instrument_selection("What instrument would you like to switch to?", student)
       puts "Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
-    when "View Data"
+    when "View Band Roster / Instrument Data"
       view_data
     when "Delete Profile"
       Student.all.delete(student)
+      puts "\n"
+      puts "Your profile has been deleted!"
+      puts "\n"
+      create_new_profile_choice = $prompt.yes?("Do you want to create a new profile?")
+      if create_new_profile_choice
+        get_student_name
+        initial_user_nav
+      else
+        puts "Thanks for using Rock Bandmaker!"
+        exit
+      end
+    when "Quit"
+      puts "\n"
+      puts "Thanks for using Rock Bandmaker!"
+      exit
   end
+  leave_or_start_over("So what's next?")
 end
 
 def new_student_selection(student)
@@ -81,9 +112,14 @@ def instrument_selection(msg, student)
   end
 end
 
+def active_bands(message)
+    $prompt.select(message, Band.all.map{|band| band.name})
+end
+
 def join_band(student)
-  band_choice = $prompt.select("Choose a band to join:", Band.all.map{|band| band.name})
+  band_choice = active_bands("Choose a band to join:")
   student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
+  leave_or_start_over("What would you like to do now?")
 end
 
 def create_band(student)
@@ -108,12 +144,10 @@ def initial_user_nav
 end
 
 def leave_or_start_over(msg)
-  choice = $prompt.select(msg, %w(Join Create Quit))
+  choice = $prompt.select(msg, ["Main Menu", "Quit"])
   case choice
-    when "Join"
-      join_band($student)
-    when "Create"
-      create_band($student)
+    when "Main Menu"
+      returning_student_selection($student)
     when "Quit"
       puts "Thanks for using Rock Bandmaker!"
       exit
@@ -121,7 +155,20 @@ def leave_or_start_over(msg)
 end
 
 def view_data
-  puts "viewing data"
+  view_data_choice = $prompt.select("Which data would you like to view?", ['Band Data', 'Instrument Data'])
+  case view_data_choice
+    when 'Band Data'
+      band_choice = active_bands("Choose a band to view their roster:")
+        puts "\n"
+        puts "Here's the roster:"
+        Band.all.find { |b| b.name == band_choice }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.capitalize}" }
+    when 'Instrument Data'
+      # choose instrument: guitar
+      instrument_data_choice = $prompt.select("Choose an instrument:", Instrument.all.map{|inst| inst.name})
+        instrument_instance = Instrument.all.find {|i| i.name == instrument_data_choice}
+        puts "There are #{instrument_instance.students.count} student(s) on #{instrument_data_choice}!"
+      # returns the count of how many guitarists are in the db along with their names
+    end
 end
 
 # def view_data
@@ -164,15 +211,22 @@ get_student_name
 initial_user_nav
 
 # closing message
-if Student.all.include?($student)
-  if $student.band_id == nil
-    leave_or_start_over("You aren't in a band.  Would you like to join or create one?")
-    else
-      puts "#{$student.name}, you're on #{student_instrument($student).name.downcase} in the band, #{Band.all.find{|b|b.id == $student.band_id}.name}!"
-      puts "Here's the roster:"
-      Band.all.find { |b| b.id == $student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
-    end
-else
-  puts "You've been expelled from the School of Rock!"
-  leave_or_start_over("Would you like to quit or start over?")
+def closing_message
+  puts "\n"
+  if Student.all.include?($student)
+    if $student.band_id == nil
+      leave_or_start_over("You aren't in a band. Head back to the Main Menu to join one!")
+      else
+        puts "#{$student.name}, you're on #{student_instrument($student).name.downcase} in the band, #{Band.all.find{|b|b.id == $student.band_id}.name}!"
+        puts "Here's the roster:"
+        Band.all.find { |b| b.id == $student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
+        puts "\n"
+        leave_or_start_over(msg)
+      end
+  else
+    puts "You've been expelled from the School of Rock!"
+    leave_or_start_over("Would you like to quit or start over?")
 end
+end
+
+closing_message

@@ -50,7 +50,7 @@ def returning_student_selection(student)
       end
     when "Change Instrument"
       instrument_selection("What instrument would you like to switch to?", student)
-      puts "Congratulations!  Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
+      puts "Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
     when "Delete Profile"
       Student.all.delete(student)
   end
@@ -95,6 +95,7 @@ def student_instrument(student)
 end
 
 # check if new or returning student
+# create method--initial_user_nav
 if Student.all.map{|s|s.name}.include?($student_name)
    # if returning student set `student` to that student
    student = Student.all.find{|s|s.name == $student_name}
@@ -120,7 +121,7 @@ if Student.all.include?(student)
     else
       puts "#{student.name}, you're on #{student_instrument(student).name.downcase} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
       puts "Here's the roster:"
-      Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts "#{s.name}: #{student_instrument(s).name.downcase}"}
+      Band.all.find { |b| b.id == student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
     end
 else
   puts "You've been expelled from the School of Rock!"

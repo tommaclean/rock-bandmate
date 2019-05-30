@@ -44,6 +44,10 @@ def join_band(student)
   student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
 end
 
+def create_band(student)
+  student.update(band_id: Band.create(name: $prompt.ask("What would you like the name of your band to be?")).id)
+end
+
 # check if new or returning student
 if Student.all.map{|s|s.name}.include?(student_name)
   # if returning student set `student` to that student
@@ -77,11 +81,11 @@ if Student.all.map{|s|s.name}.include?(student_name)
      if join_or_create == "Join"
        join_band(student)
      else
-       student.update(band_id: Band.create(name: $prompt.ask("What would you like the name of your new band to be?")).id)
+       create_band(student)
      end
    else
-     create_a_band = Band.create(name: $prompt.ask("There are no active bands so create your own!  What would you like the name of your band to be?"))
-     student.update(band_id: create_a_band.id)
+     puts "There are no active bands so create your own!"
+     create_band(student)
    end
  end
 
@@ -91,7 +95,7 @@ if Student.all.include?(student)
     leave_or_start_over = $prompt.select("You aren't in a band.  Would you like to join or create one?", %w(Join Create Quit))
     case leave_or_start_over
       when "Join"
-        puts "join a band------"
+        join_band(student)
       when "Create"
         puts "create a band-----"
       when "Quit"
@@ -105,26 +109,3 @@ if Student.all.include?(student)
 else
   puts "You've been expelled from the School of Rock!"
 end
-# if student exists, welcome them back & ask if they would like to view band or instrument data or delete acct
-### if student chooses band data, they can view other band members, leave the band, or switch to another band
-### if student chooses instrument data, they can view who else plays that instrument or change instruments
-
-# new student
-# puts "Hello, #{student.name}, what instrument do you play?"
-# # $prompt.select from pre-existing array of instruments + "other" which will allow student to write in their instrument
-# student.instrument_name = $prompt.ask
-# if !Instrument.all.map{|e|e.name}.include?(student.instrument_name)
-#   Instrument.create(name: student.instrument_name)
-# end
-#
-# join_or_create = $prompt.select("Would you like to join one or create your own?", %w(Join Create))
-# if join_or_create == "Join"
-#   existing_bands = Band.all.map{|e|e.name}
-#   join_band_selection = $prompt.select("Choose a band to join:", existing_bands)
-#   student.band_name = join_band_selection
-# else
-#   puts "What would you like the name of your new band to be?"
-#   student.band_name = Band.create(name: $prompt.ask)
-# end
-#
-# binding.pry

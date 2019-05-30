@@ -33,6 +33,44 @@ end
 
 get_student_name
 
+def returning_student_selection(student)
+  data_choices = ["Join Band", "Drop Band", "Change Instrument", "Delete Profile"]
+  data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
+  case data_choice
+    when "Join Band"
+      join_band(student)
+    when "Drop Band"
+      current_band = Band.all.find {|band| band.id == student.band_id}
+      leave_band = $prompt.yes?("Are you sure you want to leave #{current_band.name}?")
+      if leave_band
+        student.band_id = nil
+        current_band.students.delete(student)
+      else
+        puts "KEEP ON ROCKIN!!!!"
+      end
+    when "Change Instrument"
+      instrument_selection("What instrument would you like to switch to?", student)
+      puts "Congratulations!  Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
+    when "Delete Profile"
+      Student.all.delete(student)
+  end
+end
+
+def new_student_selection(student)
+  instrument_selection("What instrument do you play?", student)
+  if !Band.all.empty?
+    join_or_create = $prompt.select("Would you like to join a band or create your own?", %w(Join Create))
+    if join_or_create == "Join"
+      join_band(student)
+    else
+      create_band(student)
+    end
+  else
+    puts "There are no active bands so create your own!"
+    create_band(student)
+  end
+end
+
 def instrument_selection(msg, student)
   inst_choices = Instrument.all.map{|inst| inst.name} << "Other"
   inst_choice = $prompt.select(msg, inst_choices)
@@ -58,43 +96,13 @@ end
 
 # check if new or returning student
 if Student.all.map{|s|s.name}.include?($student_name)
-  # if returning student set `student` to that student
-  student = Student.all.find{|s|s.name == $student_name}
-  data_choices = ["Join Band", "Drop Band", "Change Instrument", "Delete Profile"]
-  data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
-  case data_choice
-    when "Join Band"
-      join_band(student)
-    when "Drop Band"
-      current_band = Band.all.find {|band| band.id == student.band_id}
-      leave_band = $prompt.yes?("Are you sure you want to leave #{current_band.name}?")
-      if leave_band
-        student.band_id = nil
-        current_band.students.delete(student)
-      else
-        puts "KEEP ON ROCKIN!!!!"
-      end
-    when "Change Instrument"
-      instrument_selection("What instrument would you like to switch to?", student)
-      puts "Congratulations!  Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
-    when "Delete Profile"
-      Student.all.delete(student)
-    end
+   # if returning student set `student` to that student
+   student = Student.all.find{|s|s.name == $student_name}
+   returning_student_selection(student)
  else
    # create new student and set to `student`
    student = Student.create(name: $student_name)
-   instrument_selection("What instrument do you play?", student)
-   if !Band.all.empty?
-     join_or_create = $prompt.select("Would you like to join a band or create your own?", %w(Join Create))
-     if join_or_create == "Join"
-       join_band(student)
-     else
-       create_band(student)
-     end
-   else
-     puts "There are no active bands so create your own!"
-     create_band(student)
-   end
+   new_student_selection(student)
  end
 
 # closing message

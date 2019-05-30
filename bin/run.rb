@@ -87,8 +87,7 @@ else
       join_band_selection = $prompt.select("Choose a band to join:", existing_bands)
       student.update(band_id: Band.all.find{|band| band.name == join_band_selection}.id)
     else
-      puts "What would you like the name of your new band to be?"
-      student.band_id = Band.create(name: $prompt.ask).id
+      student.update(band_id: Band.create(name: $prompt.ask("What would you like the name of your new band to be?")).id)
     end
   else
     create_a_band = Band.create(name: $prompt.ask("There are no active bands so create your own!  What would you like the name of your band to be?"))
@@ -98,8 +97,8 @@ end
 
 if Student.all.include?(student)
   puts "#{student.name}, you play #{Instrument.all.find{|i|i.id == student.instrument_id}.name} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
-  puts "Here's the roster':"
-  Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts s.name}
+  puts "Here's the roster:"
+  Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts "#{s.name}: #{Instrument.all.find{|i|i.id == s.instrument_id}.name}"}
 else
   puts "You've been expelled from the School of Rock!"
 end

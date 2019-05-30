@@ -105,21 +105,26 @@ def initial_user_nav
   end
 end
 
+def leave_or_start_over(msg)
+  choice = $prompt.select(msg, %w(Join Create Quit))
+  case choice
+    when "Join"
+      join_band($student)
+    when "Create"
+      create_band($student)
+    when "Quit"
+      puts "Thanks for using Rock Bandmaker!"
+      exit
+  end
+end
+
 get_student_name
 initial_user_nav
 
 # closing message
 if Student.all.include?($student)
   if $student.band_id == nil
-    leave_or_start_over = $prompt.select("You aren't in a band.  Would you like to join or create one?", %w(Join Create Quit))
-    case leave_or_start_over
-      when "Join"
-        join_band($student)
-      when "Create"
-        create_band($student)
-      when "Quit"
-        puts "leaving program..........."
-      end
+    leave_or_start_over("You aren't in a band.  Would you like to join or create one?")
     else
       puts "#{$student.name}, you're on #{student_instrument($student).name.downcase} in the band, #{Band.all.find{|b|b.id == $student.band_id}.name}!"
       puts "Here's the roster:"
@@ -127,5 +132,5 @@ if Student.all.include?($student)
     end
 else
   puts "You've been expelled from the School of Rock!"
-  exit
+  leave_or_start_over("Would you like to quit or start over?")
 end

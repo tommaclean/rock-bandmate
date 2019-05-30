@@ -38,7 +38,6 @@ def instrument_selection(msg, student)
   end
 end
 
-
 def join_band(student)
   band_choice = $prompt.select("Choose a band to join:", Band.all.map{|band| band.name})
   student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
@@ -46,6 +45,10 @@ end
 
 def create_band(student)
   student.update(band_id: Band.create(name: $prompt.ask("What would you like the name of your band to be?")).id)
+end
+
+def student_instrument(student)
+  Instrument.all.find{|i|i.id == student.instrument_id}
 end
 
 # check if new or returning student
@@ -97,14 +100,14 @@ if Student.all.include?(student)
       when "Join"
         join_band(student)
       when "Create"
-        puts "create a band-----"
+        create_band(student)
       when "Quit"
         puts "leaving program..........."
       end
     else
-      puts "#{student.name}, you play #{Instrument.all.find{|i|i.id == student.instrument_id}.name} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
+      puts "#{student.name}, you're on #{student_instrument(student).name.downcase} in the band, #{Band.all.find{|b|b.id == student.band_id}.name}!"
       puts "Here's the roster:"
-      Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts "#{s.name}: #{Instrument.all.find{|i|i.id == s.instrument_id}.name}"}
+      Band.all.find{|b|b.id==student.band_id}.students.each{|s| puts "#{s.name}: #{student_instrument(s).name.downcase}"}
     end
 else
   puts "You've been expelled from the School of Rock!"

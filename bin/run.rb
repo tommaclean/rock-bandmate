@@ -51,7 +51,7 @@ def returning_student_selection(student)
     when "Drop Band"
       if student.band_id == nil
         puts "\n"
-        puts "You're not in a band! Back to the main menu with you!"
+        puts "You're not in a band!".red + "Back to the main menu with you!"
         puts "\n"
         returning_student_selection(student)
       end
@@ -71,9 +71,9 @@ def returning_student_selection(student)
     when "View Profile"
       puts "\nName: #{student.name}"
       if student.band
-        puts "Current band: #{student.band.name}"
+        puts "Current Band: #{student.band.name}"
       else
-        puts "Current band: You're not in a band!"
+        puts "Current Band: " + "You're not in a band!".red
       end
       puts "Instrument: #{student.instrument.name}\n\n"
     when "Delete Profile"
@@ -177,7 +177,9 @@ def view_data
       # choose instrument: guitar
       instrument_data_choice = $prompt.select("Choose an instrument:", Instrument.all.map{|inst| inst.name})
         instrument_instance = Instrument.all.find {|i| i.name == instrument_data_choice}
+          binding.pry
         puts "There are #{instrument_instance.students.count} student(s) on #{instrument_data_choice}!"
+
       # returns the count of how many guitarists are in the db along with their names
     end
 end

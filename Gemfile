@@ -2,6 +2,7 @@
 source "https://rubygems.org"
 
 # gem "activerecord"
+gem "colorize"
 gem "audite"
 gem "tty-prompt"
 gem "sinatra-activerecord"

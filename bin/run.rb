@@ -26,8 +26,12 @@ $prompt = TTY::Prompt.new
 # student = Student.create()
 
 # get student name
-puts "What is your name?"
-student_name = $prompt.ask
+def get_student_name
+  puts "What is your name?"
+  $student_name = $prompt.ask
+end
+
+get_student_name
 
 def instrument_selection(msg, student)
   inst_choices = Instrument.all.map{|inst| inst.name} << "Other"
@@ -53,9 +57,9 @@ def student_instrument(student)
 end
 
 # check if new or returning student
-if Student.all.map{|s|s.name}.include?(student_name)
+if Student.all.map{|s|s.name}.include?($student_name)
   # if returning student set `student` to that student
-  student = Student.all.find{|s|s.name == student_name}
+  student = Student.all.find{|s|s.name == $student_name}
   data_choices = ["Join Band", "Drop Band", "Change Instrument", "Delete Profile"]
   data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
   case data_choice
@@ -78,7 +82,7 @@ if Student.all.map{|s|s.name}.include?(student_name)
     end
  else
    # create new student and set to `student`
-   student = Student.create(name: student_name)
+   student = Student.create(name: $student_name)
    instrument_selection("What instrument do you play?", student)
    if !Band.all.empty?
      join_or_create = $prompt.select("Would you like to join a band or create your own?", %w(Join Create))

@@ -125,7 +125,7 @@ end
 
 def join_band(student)
   band_choice = active_bands("Choose a band to join:")
-  if Band.all.include?(band_choice)
+  if Band.all.map{|band|band.name}.include?(band_choice)
     student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
   else
     returning_student_selection(student)

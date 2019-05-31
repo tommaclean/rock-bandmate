@@ -56,36 +56,13 @@ def returning_student_selection(student)
     when "Create Band"
       create_band(student)
     when "Drop Band"
-      if student.band_id == nil
-        puts "\n"
-        puts "You're not in a band!".red + "Back to the main menu with you!"
-        puts "\n"
-        returning_student_selection(student)
-      end
-      current_band = Band.all.find {|band| band.id == student.band_id}
-      leave_band = $prompt.yes?("Are you sure you want to leave #{current_band.name}?")
-      if leave_band
-        student.band_id = nil
-        current_band.students.delete(student)
-        if current_band.students.length == 0
-          Band.delete(current_band)
-        end
-      else
-        puts "KEEP ON ROCKIN!!!!"
-      end
+      drop_band(student)
     when "Change Instrument"
-      instrument_selection("What instrument would you like to switch to?", student)
-      puts "\nYour new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!\n\n"
+      change_instrument(student)
     when "View Band Roster / Instrument Data"
       view_data
     when "View Profile"
-      puts "\nName: #{student.name}"
-      if student.band
-        puts "Current Band: #{student.band.name}"
-      else
-        puts "Current Band: " + "You're not in a band!".red
-      end
-      puts "Instrument: #{student.instrument.name}\n\n"
+      view_profile(student)
     when "Delete Profile"
       delete_profile(student)
     when "Quit"
@@ -119,6 +96,11 @@ def instrument_selection(msg, student)
   end
 end
 
+def change_instrument(student)
+  instrument_selection("What instrument would you like to switch to?", student)
+  puts "\nYour new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!".light_yellow + "\n\n"
+end
+
 def active_bands(message)
   $prompt.select(message, Band.all.map{|band| band.name} << "Go Back")
 end
@@ -139,6 +121,37 @@ def create_band(student)
   student.update(band_id: new_band.id)
   new_band.update(name: new_band.name.split.map!{|e| e.capitalize}.join(" "))
   puts "\n#{new_band.name} formation date: #{Time.now.strftime("%A, %B %d, %Y")}".light_yellow + "\n"
+end
+
+def drop_band(student)
+  if student.band_id == nil
+    puts "\n"
+    puts "You're not in a band!".red + "Back to the main menu with you!"
+    puts "\n"
+    returning_student_selection(student)
+  end
+  current_band = Band.all.find {|band| band.id == student.band_id}
+  leave_band = $prompt.yes?("Are you sure you want to leave #{current_band.name}?")
+  if leave_band
+    student.band_id = nil
+    current_band.students.delete(student)
+    if current_band.students.length == 0
+      Band.delete(current_band)
+    end
+    view_profile(student)
+  else
+    puts "KEEP ON ROCKIN!!!!"
+  end
+end
+
+def view_profile(student)
+  puts "\nName: #{student.name}"
+  if student.band
+    puts "Current Band: #{student.band.name}"
+  else
+    puts "Current Band: " + "You're not in a band!".red
+  end
+  puts "Instrument: #{student.instrument.name}\n\n"
 end
 
 def delete_profile(student)

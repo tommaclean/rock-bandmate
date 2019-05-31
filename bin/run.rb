@@ -137,7 +137,6 @@ def create_band(student)
   new_band = Band.create(name: $prompt.ask("What would you like the name of your band to be?"))
   student.update(band_id: new_band.id)
   new_band.update(name: new_band.name.split.map!{|e| e.capitalize}.join(" "))
-  # d = DateTime.new(Time.now)
   puts "\n#{new_band.name} formation date: #{Time.now.strftime("%A, %B %d, %Y")}".light_yellow + "\n"
 end
 

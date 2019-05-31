@@ -36,7 +36,7 @@ Student.create(name: "Tony", band_id: kevins_nola_sunburn.id, instrument_id: dru
 
 # set up $prompt and new student
 $prompt = TTY::Prompt.new
-# student = Student.create()
+
 # get student name
 def get_student_name
   $student_name = $prompt.ask("What is your name?", required: true).capitalize
@@ -89,7 +89,7 @@ end
 def instrument_selection(msg, student)
   inst_choices = Instrument.all.map{|inst| inst.name} << "❓ Other"
   inst_choice = $prompt.select(msg, inst_choices)
-  if inst_choice == "Other"
+  if inst_choice.include?("Other")
     student.update(instrument_id: Instrument.create(name: $prompt.ask("Please enter the name of your instrument:")).id)
   else
     student.update(instrument_id: Instrument.all.find{|inst| inst.name == inst_choice}.id)
@@ -120,7 +120,7 @@ def create_band(student)
   new_band = Band.create(name: $prompt.ask("What would you like the name of your band to be?"))
   student.update(band_id: new_band.id)
   new_band.update(name: new_band.name.split.map!{|e| e.capitalize}.join(" "))
-  puts "\n#{new_band.name} formation date: #{Time.now.strftime("%A, %B %d, %Y")}".light_yellow + "\n"
+  puts "\n#{new_band.name} formation date: #{Time.now.strftime("%A, %B %d, %Y")}".light_yellow + "\n\n"
 end
 
 def drop_band(student)
@@ -156,7 +156,7 @@ end
 
 def delete_profile(student)
   Student.all.delete(student)
-  puts "\nYour profile has been deleted!\n\n"
+  puts "\n" + "Your profile has been deleted!".red + "\n\n"
   create_new_profile_choice = $prompt.yes?("Do you want to create a new profile?")
   if create_new_profile_choice
     get_student_name
@@ -232,27 +232,24 @@ def view_data
     end
 end
 
-get_student_name
-capitalize_band_names
-initial_user_nav
-
-# closing message
 def closing_message
-  puts "\n"
   if Student.all.include?($student)
     if $student.band_id == nil
       leave_or_start_over("You aren't in a band. Head back to the Main Menu to join one!")
-      else
-        puts "#{$student.name}, you're on #{student_instrument($student).name.downcase} in the band, #{Band.all.find{|b|b.id == $student.band_id}.name}!"
-        puts "Here's the roster:"
-        Band.all.find { |b| b.id == $student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
-        puts "\n"
-        leave_or_start_over("What would you like to do next?")
-      end
+    else
+      puts "#{$student.name}, you're on #{student_instrument($student).name.downcase} in the band, #{Band.all.find{|b|b.id == $student.band_id}.name}!"
+      puts "Here's the roster:"
+      Band.all.find { |b| b.id == $student.band_id }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.downcase}" }
+      puts "\n"
+      leave_or_start_over("What would you like to do next?")
+    end
   else
     puts "You've been expelled from the School of Rock!"
     leave_or_start_over("Would you like to quit or start over?")
-end
+  end
 end
 
+get_student_name
+capitalize_band_names
+initial_user_nav
 closing_message

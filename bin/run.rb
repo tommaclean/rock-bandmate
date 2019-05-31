@@ -125,10 +125,11 @@ end
 
 def join_band(student)
   band_choice = active_bands("Choose a band to join:")
-  if Band.all.map{|band|band.name}.include?(band_choice)
-    student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
+  if student.band_id != nil && student.band.name == band_choice
+    puts "\nYou're already in #{band_choice}!".red + "\n\n"
   else
-    returning_student_selection(student)
+    Band.all.map{ |b| b.name }.include?(band_choice) ? student.update(band_id: Band.all.find { |b| b.name == band_choice}.id) : returning_student_selection(student)
+    puts "\nYou are now a member of #{band_choice}!".light_cyan + "\n\n"
   end
   leave_or_start_over("What would you like to do now?")
 end

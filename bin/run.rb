@@ -191,10 +191,13 @@ def view_data
       # choose instrument: guitar
       instrument_data_choice = $prompt.select("Choose an instrument:", Instrument.all.map{|inst| inst.name})
         instrument_instance = Instrument.all.find {|i| i.name == instrument_data_choice}
-          binding.pry
-        puts "There are #{instrument_instance.students.count} student(s) on #{instrument_data_choice}!"
-
-      # returns the count of how many guitarists are in the db along with their names
+        puts "\nThere are #{instrument_instance.students.count} student(s) on #{instrument_data_choice}!"
+        puts "Here is a list of those students:\n\n"
+        instrument_instance.students.each do |s|
+          # binding.pry
+          puts "#{s.name} (#{s.band_id ? Band.all.find{|band| band.id == s.band_id}.name : 'Not in a band!'.red})"
+        end
+        puts "\n"
     end
 end
 

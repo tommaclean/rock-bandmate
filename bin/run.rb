@@ -199,26 +199,36 @@ def leave_or_start_over(msg)
   end
 end
 
+def get_band_data
+  band_choice = active_bands("Choose a band to view their roster:")
+    if band_choice != "Go Back"
+      puts "\n"
+      puts "Here's the roster:"
+      Band.all.find { |b| b.name == band_choice }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.capitalize}" }
+    end
+  puts "\n"
+end
+
+def get_instrument_data
+  instrument_data_choice = $prompt.select("Choose an instrument:", Instrument.all.map{|inst| inst.name})
+  instrument_instance = Instrument.all.find {|i| i.name == instrument_data_choice}
+  puts "\nThere are #{instrument_instance.students.count} student(s) on #{instrument_data_choice}!"
+  if instrument_instance.students.count > 0
+    puts "Here is a list of those students:\n\n"
+  end
+  instrument_instance.students.each do |s|
+    puts "#{s.name} (#{s.band_id ? Band.all.find{|band| band.id == s.band_id}.name : 'Not in a band!'.red})"
+  end
+  puts "\n"
+end
+
 def view_data
   view_data_choice = $prompt.select("Which data would you like to view?", ['Band Data', 'Instrument Data'])
   case view_data_choice
     when 'Band Data'
-      band_choice = active_bands("Choose a band to view their roster:")
-        puts "\n"
-        puts "Here's the roster:"
-        Band.all.find { |b| b.name == band_choice }.students.each { |s| puts "#{s.name}: #{student_instrument(s).name.capitalize}" }
-        puts "\n"
+      get_band_data
     when 'Instrument Data'
-      # choose instrument: guitar
-      instrument_data_choice = $prompt.select("Choose an instrument:", Instrument.all.map{|inst| inst.name})
-        instrument_instance = Instrument.all.find {|i| i.name == instrument_data_choice}
-        puts "\nThere are #{instrument_instance.students.count} student(s) on #{instrument_data_choice}!"
-        puts "Here is a list of those students:\n\n"
-        instrument_instance.students.each do |s|
-          # binding.pry
-          puts "#{s.name} (#{s.band_id ? Band.all.find{|band| band.id == s.band_id}.name : 'Not in a band!'.red})"
-        end
-        puts "\n"
+      get_instrument_data
     end
 end
 

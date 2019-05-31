@@ -7,28 +7,30 @@ Band.delete_all
 Student.delete_all
 
 # Instrument defaults
-guitar = Instrument.create(name: "Guitar")
-bass = Instrument.create(name: "Bass")
-keyboard = Instrument.create(name: "Keyboard")
-vocals = Instrument.create(name: "Vocals")
-drums = Instrument.create(name: "Drums")
+guitar = Instrument.create(name: "🎸 Guitar")
+bass = Instrument.create(name: "𝄢 Bass")
+keyboard = Instrument.create(name: "🎹 Keys")
+vocals = Instrument.create(name: "🎤 Vocals")
+drums = Instrument.create(name: "🥁 Drums")
 
-the_white_stripes = Band.create(name: "the white stripes")
-deftones = Band.create(name: "deftones")
-the_beatles = Band.create(name: "the beatles")
+the_summertime_joes = Band.create(name: "🌞 the summertime joes ☕️")
+avi_and_the_whattheforks = Band.create(name: "🍴 avi and the whattheforks 🍴")
+kevins_nola_sunburn = Band.create(name: "🏖 kevin's NOLA sunburn ⛱")
+glorious_pegasus = Band.create(name: "🦄🦄🦄 Glorious Pegasus 🦄🦄🦄")
 
-Student.create(name: "Tom", band_id: deftones.id, instrument_id: keyboard.id)
-Student.create(name: "Josh", band_id: deftones.id, instrument_id: bass.id)
-Student.create(name: "Avi", band_id: deftones.id, instrument_id: drums.id)
-Student.create(name: "Joe", band_id: the_beatles.id, instrument_id: guitar.id)
-Student.create(name: "George", band_id: the_beatles.id, instrument_id: bass.id)
-Student.create(name: "Carla", band_id: the_beatles.id, instrument_id: drums.id)
-Student.create(name: "Lucy", band_id: the_white_stripes.id, instrument_id: keyboard.id)
-Student.create(name: "Kenton", band_id: the_white_stripes.id, instrument_id: bass.id)
-Student.create(name: "Bill", band_id: the_white_stripes.id, instrument_id: drums.id)
-Student.create(name: "Kevin", band_id: the_white_stripes.id, instrument_id: guitar.id)
-Student.create(name: "Greg", band_id: the_beatles.id, instrument_id: bass.id)
-Student.create(name: "Tony", band_id: the_beatles.id, instrument_id: drums.id)
+
+Student.create(name: "Tom", band_id: avi_and_the_whattheforks.id, instrument_id: keyboard.id)
+Student.create(name: "Josh", band_id: avi_and_the_whattheforks.id, instrument_id: bass.id)
+Student.create(name: "Avi", band_id: avi_and_the_whattheforks.id, instrument_id: drums.id)
+Student.create(name: "Joe", band_id: kevins_nola_sunburn.id, instrument_id: guitar.id)
+Student.create(name: "George", band_id: kevins_nola_sunburn.id, instrument_id: bass.id)
+Student.create(name: "Carla", band_id: kevins_nola_sunburn.id, instrument_id: drums.id)
+Student.create(name: "Lucy", band_id: the_summertime_joes.id, instrument_id: keyboard.id)
+Student.create(name: "Kenton", band_id: the_summertime_joes.id, instrument_id: bass.id)
+Student.create(name: "Bill", band_id: the_summertime_joes.id, instrument_id: drums.id)
+Student.create(name: "Kevin", band_id: the_summertime_joes.id, instrument_id: guitar.id)
+Student.create(name: "Greg", band_id: kevins_nola_sunburn.id, instrument_id: bass.id)
+Student.create(name: "Tony", band_id: kevins_nola_sunburn.id, instrument_id: drums.id)
 
 
 # set up $prompt and new student
@@ -36,7 +38,11 @@ $prompt = TTY::Prompt.new
 # student = Student.create()
 # get student name
 def get_student_name
-  $student_name = $prompt.ask("What is your name?", required: true)
+  $student_name = $prompt.ask("What is your name?", required: true).capitalize
+end
+
+def capitalize_band_names
+  Band.all.each{|b| b.update(name: b.name.split.map!{|n|n.capitalize}.join(' '))}
 end
 
 def returning_student_selection(student)
@@ -115,7 +121,7 @@ def new_student_selection(student)
 end
 
 def instrument_selection(msg, student)
-  inst_choices = Instrument.all.map{|inst| inst.name} << "Other"
+  inst_choices = Instrument.all.map{|inst| inst.name} << "❓ Other"
   inst_choice = $prompt.select(msg, inst_choices)
   if inst_choice == "Other"
     student.update(instrument_id: Instrument.create(name: $prompt.ask("Please enter the name of your instrument:")).id)
@@ -125,17 +131,23 @@ def instrument_selection(msg, student)
 end
 
 def active_bands(message)
-    $prompt.select(message, Band.all.map{|band| band.name})
+  $prompt.select(message, Band.all.map{|band| band.name} << "Go Back")
 end
 
 def join_band(student)
   band_choice = active_bands("Choose a band to join:")
-  student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
+  if Band.all.include?(band_choice)
+    student.update(band_id: Band.all.find {|band| band.name == band_choice}.id)
+  else
+    returning_student_selection(student)
+  end
   leave_or_start_over("What would you like to do now?")
 end
 
 def create_band(student)
-  student.update(band_id: Band.create(name: $prompt.ask("What would you like the name of your band to be?")).id)
+  new_band = Band.create(name: $prompt.ask("What would you like the name of your band to be?"))
+  student.update(band_id: new_band.id)
+  new_band.update(name: new_band.name.split.map!{|e| e.capitalize}.join(" "))
 end
 
 def student_instrument(student)
@@ -223,6 +235,7 @@ end
 # end
 
 get_student_name
+capitalize_band_names
 initial_user_nav
 
 # closing message

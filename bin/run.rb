@@ -198,42 +198,6 @@ def view_data
     end
 end
 
-# def view_data
-#   choice = $prompt.select("Which data would you like to view?", ['Band Data', 'Instrument Data'])
-#   case choice
-#     when "Band Data"
-#       band_choice = Band.all.find{|band| band.name == $prompt.select("Please choose a band whose data you would like to view", Band.all.map{|band| band.name})}
-#       data_choice = $prompt.select("What data would you like to view?", %w(Roster Instruments))
-#       case data_choice
-#         when "Roster"
-#           puts "Lineup for #{band_choice.name}:"
-#           band_choice.students.each{|student| puts "#{student.name}: #{student.instrument.name}"}
-#         when "Instruments"
-#           num_arr = []
-#           arr = band_choice.instruments.map do |inst|
-#             if arr.include?(inst.name)
-#               num_arr[arr.index(inst.name)] += 1
-#             else
-#               arr << inst.name
-#               num_arr << 1
-#             end
-#             puts "#{band_choice.name} currently has:"
-#             arr.each_with_index do |val, index|
-#               if num_arr[index] == 1
-#                 puts "#{num_arr[index]} student on #{val}"
-#               else
-#                 puts "#{num_arr[index]} students on #{val}"
-#               end
-#             end
-#           end
-#       end
-#     when "Instrument Data"
-#       # see how many students play same instrument
-#       # see what bands have student playing same instrument
-#       # see what bands are lacking current instrument player
-#   end
-# end
-
 get_student_name
 capitalize_band_names
 initial_user_nav

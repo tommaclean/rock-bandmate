@@ -36,8 +36,7 @@ $prompt = TTY::Prompt.new
 # student = Student.create()
 # get student name
 def get_student_name
-  puts "What is your name?"
-  $student_name = $prompt.ask
+  $student_name = $prompt.ask("What is your name?", required: true)
 end
 
 def returning_student_selection(student)
@@ -60,6 +59,9 @@ def returning_student_selection(student)
       if leave_band
         student.band_id = nil
         current_band.students.delete(student)
+        if current_band.students.length == 0
+          Band.delete(current_band)
+        end
       else
         puts "KEEP ON ROCKIN!!!!"
       end

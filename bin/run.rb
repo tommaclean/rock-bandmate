@@ -13,12 +13,13 @@ keyboard = Instrument.create(name: "🎹 Keys")
 vocals = Instrument.create(name: "🎤 Vocals")
 drums = Instrument.create(name: "🥁 Drums")
 
+# Bands
 the_summertime_joes = Band.create(name: "🌞 the summertime joes ☕️")
 avi_and_the_whattheforks = Band.create(name: "🍴 avi and the whattheforks 🍴")
 kevins_nola_sunburn = Band.create(name: "🏖 kevin's NOLA sunburn ⛱")
 glorious_pegasus = Band.create(name: "🦄🦄🦄 Glorious Pegasus 🦄🦄🦄")
 
-
+# Students
 Student.create(name: "Tom", band_id: avi_and_the_whattheforks.id, instrument_id: keyboard.id)
 Student.create(name: "Josh", band_id: avi_and_the_whattheforks.id, instrument_id: bass.id)
 Student.create(name: "Avi", band_id: avi_and_the_whattheforks.id, instrument_id: drums.id)
@@ -45,6 +46,7 @@ def capitalize_band_names
   Band.all.each{|b| b.update(name: b.name.split.map!{|n|n.capitalize}.join(' '))}
 end
 
+# Main menu
 def returning_student_selection(student)
   data_choices = ["Join Band", "Create Band", "Drop Band", "Change Instrument", "View Band Roster / Instrument Data", "View Profile", "Delete Profile", "Quit"]
   data_choice = $prompt.select("Welcome back, #{student.name}! What would you like to do today?", data_choices)
@@ -73,7 +75,7 @@ def returning_student_selection(student)
       end
     when "Change Instrument"
       instrument_selection("What instrument would you like to switch to?", student)
-      puts "Your new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!"
+      puts "\nYour new instrument is #{Instrument.all.find{|inst| inst.id == student.instrument_id}.name}!\n\n"
     when "View Band Roster / Instrument Data"
       view_data
     when "View Profile"
@@ -85,22 +87,9 @@ def returning_student_selection(student)
       end
       puts "Instrument: #{student.instrument.name}\n\n"
     when "Delete Profile"
-      Student.all.delete(student)
-      puts "\n"
-      puts "Your profile has been deleted!"
-      puts "\n"
-      create_new_profile_choice = $prompt.yes?("Do you want to create a new profile?")
-      if create_new_profile_choice
-        get_student_name
-        initial_user_nav
-      else
-        puts "Thanks for using Rock BandMaker!"
-        exit
-      end
+      delete_profile(student)
     when "Quit"
-      puts "\n"
-      puts "Thanks for using Rock BandMaker!"
-      exit
+      quit_app
   end
   leave_or_start_over("So what's next?")
 end
@@ -148,6 +137,25 @@ def create_band(student)
   new_band = Band.create(name: $prompt.ask("What would you like the name of your band to be?"))
   student.update(band_id: new_band.id)
   new_band.update(name: new_band.name.split.map!{|e| e.capitalize}.join(" "))
+  # d = DateTime.new(Time.now)
+  puts "\n#{new_band.name} formation date: #{Time.now.strftime("%A, %B %d, %Y")}".light_yellow + "\n"
+end
+
+def delete_profile(student)
+  Student.all.delete(student)
+  puts "\nYour profile has been deleted!\n\n"
+  create_new_profile_choice = $prompt.yes?("Do you want to create a new profile?")
+  if create_new_profile_choice
+    get_student_name
+    initial_user_nav
+  else
+    quit_app
+  end
+end
+
+def quit_app
+  puts "\nThanks for using Rock BandMaker!\n\n"
+  exit
 end
 
 def student_instrument(student)

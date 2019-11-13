@@ -2,6 +2,7 @@
 source "https://rubygems.org"
 
 # gem "activerecord"
+gem "rack", ">= 1.6.11"
 gem "colorize"
 gem "audite"
 gem "tty-prompt"
